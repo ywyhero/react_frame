@@ -10,12 +10,17 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 axios.defaults.baseURL = Env.api || 'http://localhost:3000'
 axios.defaults.withCredentials = false
 
-if(appInfo) {
-    axios.default.headers = {...axios.default.headers, ...appInfo, ...userInfo}
-}  else if(token) {
-    axios.default.headers["Jwt-Token"] = token;
-}
 axios.interceptors.request.use(config => {
+    if(appInfo) {
+        config.headers["Jwt-Token"] = userInfo['Jwt-Token'] || '';
+        config.headers["time"] = Math.round(new Date().getTime() / 1000);
+        config.headers["clientType"] = appInfo.clientType || '';
+        config.headers["application"] = appInfo.application || '';
+        config.headers["version"] = appInfo.version || '';
+        config.headers["device"] = appInfo.device || '';
+    }  else if(token) {
+        config.headers["Jwt-Token"] = token;
+    }
     return config
 }, error => {
     return Promise.reject(error)
